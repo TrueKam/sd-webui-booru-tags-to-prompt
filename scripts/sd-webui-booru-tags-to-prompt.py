@@ -1,7 +1,7 @@
 # Booru Tags to Prompt for Stable Diffusion WebUI Forge
 # Script by David R. Collins
 #
-# Version 1.0.0
+# Version 1.1.0
 # Released under the GNU General Public License Version 3, 29 June 2007
 #
 # Project based on ideas from danbooru-prompt by EnsignMK (https://github.com/EnsignMK/danbooru-prompt)
@@ -23,6 +23,27 @@ from urllib.request import urlopen
 
 def on_ui_settings():
     section = ('booru-tags-to-prompt', "Booru Link")
+
+def fetchTags(url):
+    # Figure out which algorithm to use and fetch the necessary tags.
+    if "gelbooru.com/index.php" in url:
+        return fetchGelbooruTags(url)
+    elif "danbooru.donmai.us/posts" in url:
+        return "danbooru Url Entered; Not Yet Implemented"
+    elif ("chan.sankakucomplex.com" in url) and ("posts" in url):
+        # This conditional is pretty weird because Sankaku Complex adds "en" between the domain and /posts/.
+        # This way /should/ allow any language that they add in to function.
+        return "sankakuComplex Chan Url Entered; Not Yet Implemented"
+    elif ("idol.sankakucomplex.com" in url) and ("posts" in url):
+        # This conditional is pretty weird because Sankaku Complex adds "en" between the domain and /posts/.
+        # This way /should/ allow any language that they add in to function.
+        return "sankakuComplex Idol Url Entered; Not Yet Implemented"
+    elif "aibooru.online/posts" in url:
+        return "aibooru Url Entered; Not Yet Implemented"
+    else:
+        return "Unsupported URL; Must be a post on gelbooru.com, danbooru.donmai.us, chan.sankakucomplex.com, idol.sankakucomplex.com, or aibooru.online"
+
+    
 
 def fetchGelbooruTags(url):
 
@@ -77,9 +98,9 @@ class BooruPromptsScript(scripts.Script):
 
             with contextlib.suppress(AttributeError):
                 if is_img2img:
-                    fetch_tags.click(fn=fetchGelbooruTags, inputs=[link], outputs=[self.boxxIMG])
+                    fetch_tags.click(fn=fetchTags, inputs=[link], outputs=[self.boxxIMG])
                 else:
-                    fetch_tags.click(fn=fetchGelbooruTags, inputs=[link], outputs=[self.boxx])
+                    fetch_tags.click(fn=fetchTags, inputs=[link], outputs=[self.boxx])
 
         return [link, fetch_tags]
 
