@@ -1,7 +1,7 @@
 # Booru Tags to Prompt for Stable Diffusion WebUI Forge
 # Script by David R. Collins
 #
-# Version 1.1.0
+# Version 1.1.5
 # Released under the GNU General Public License Version 3, 29 June 2007
 #
 # Project based on ideas from danbooru-prompt by EnsignMK (https://github.com/EnsignMK/danbooru-prompt)
@@ -43,16 +43,10 @@ def fetchTags(url):
     else:
         return "Unsupported URL; Must be a post on gelbooru.com, danbooru.donmai.us, chan.sankakucomplex.com, idol.sankakucomplex.com, or aibooru.online"
 
-    
-
 def fetchGelbooruTags(url):
 
-    # First, verify that the passed URL is valid.
-    if "gelbooru.com/index.php" not in url:
-        return "Unsupported URL; Must be a post on gelbooru.com."
-
     # Read the HTML content and parse it via BeautifulSoup.
-    rawHtml = requests.get(url, headers={'user-agent': 'stable-diffusion-webui-booru-tags-to-prompt/1.0.0'}).text
+    rawHtml = requests.get(url, headers={'user-agent': 'sd-webui-booru-tags-to-prompt/1.1.0'}).text
     parsedHtml = BeautifulSoup(rawHtml, 'html.parser')
 
     # Parse the HTML to find the 'section' element that includes the 'data-md5' attribute, then extract that attribute
@@ -85,7 +79,7 @@ class BooruPromptsScript(scripts.Script):
         super().__init__()
 
     def title(self):
-        return ("Booru Link")
+        return ("Booru Link to Tags")
 
     def show(self, is_img2img):
         return scripts.AlwaysVisible
