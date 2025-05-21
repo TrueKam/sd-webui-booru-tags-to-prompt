@@ -1,7 +1,7 @@
 # Booru Tags to Prompt for Stable Diffusion WebUI Forge
 # Script by David R. Collins
 #
-# Version 1.1.0
+# Version 1.1.5
 # Released under the GNU General Public License Version 3, 29 June 2007
 #
 # Project based on ideas from danbooru-prompt by EnsignMK (https://github.com/EnsignMK/danbooru-prompt)
