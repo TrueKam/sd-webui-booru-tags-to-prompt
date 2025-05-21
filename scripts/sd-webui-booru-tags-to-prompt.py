@@ -29,7 +29,7 @@ def fetchTags(url):
     if "gelbooru.com/index.php" in url:
         return fetchGelbooruTags(url)
     elif "danbooru.donmai.us/posts" in url:
-        return "danbooru Url Entered; Not Yet Implemented"
+        return fetchDanbooruTags(url)
     elif ("chan.sankakucomplex.com" in url) and ("posts" in url):
         # This conditional is pretty weird because Sankaku Complex adds "en" between the domain and /posts/.
         # This way /should/ allow any language that they add in to function.
@@ -42,6 +42,43 @@ def fetchTags(url):
         return "aibooru Url Entered; Not Yet Implemented"
     else:
         return "Unsupported URL; Must be a post on gelbooru.com, danbooru.donmai.us, chan.sankakucomplex.com, idol.sankakucomplex.com, or aibooru.online"
+
+def fetchDanbooruTags(url):
+
+    # Get the JSON contents of the post using the passed-in URL.
+    if "?" in url:
+        pos = url.find("?")
+        ch = url[:pos]
+    url = url + ".json"
+    # Read the HTML content and parse it via BeautifulSoup.
+    rawHtml = requests.get(url, headers={'user-agent': 'sd-webui-booru-tags-to-prompt/1.1.0'})
+    parsedHtml = rawHtml.json()
+
+    artistTag = parsedHtml["tag_string_artist"]
+    charTag = parsedHtml["tag_string_character"]
+    copyrightTag = parsedHtml["tag_string_copyright"]
+    metaTags = parsedHtml["tag_string_meta"]
+    generalTags = parsedHtml["tag_string_general"]
+
+    # Add the known values of the tags to the list. This is currently broken up because Danbooru makes it easy and doing
+    # it this way allows optionally removing the artist and character tags later easier. I don't want to implement this
+    # until I have a good way to do it for all boorus, though.
+    outputTags = ""
+    outputTags += artistTag
+    outputTags += " " + charTag
+    outputTags += " " + copyrightTag
+    outputTags += " " + metaTags
+    outputTags += " " + generalTags
+
+    # Clean up the tags so they can be dropped into the prompt.
+    outputTags = outputTags.replace(" ", ", ")
+    outputTags = outputTags.replace("_", " ")
+    outputTags = outputTags.replace("(", "\(")
+    outputTags = outputTags.replace(")", "\)")
+    outputTags = outputTags.replace("[", "\[")
+    outputTags = outputTags.replace("]", "\]")
+    print(outputTags)
+    return outputTags
 
 def fetchGelbooruTags(url):
 
@@ -79,14 +116,14 @@ class BooruPromptsScript(scripts.Script):
         super().__init__()
 
     def title(self):
-        return ("Booru Link to Tags")
+        return ("Booru Link to Prompt")
 
     def show(self, is_img2img):
         return scripts.AlwaysVisible
 
     def ui(self, is_img2img):
         with gr.Group():
-            with gr.Accordion("Booru Link", open=False):
+            with gr.Accordion("Booru Link to Prompt", open=False):
                 fetch_tags = gr.Button(value='Get Tags', variant='primary')
                 link = gr.Textbox(label="Post URL")
 
