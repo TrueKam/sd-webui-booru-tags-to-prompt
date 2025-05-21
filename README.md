@@ -3,9 +3,10 @@ A StableDiffusion-WebUI Forge script to get a list of tags from supported image 
 Currently supported URLs:
 - gelbooru.com
 - danbooru.donmai.us
+- aibooru.online
 
 ## Future Plans
-- Add support for other boorus. Currently planned supported URLs are: ~~danbooru.donmai.us~~, chan.sankakucomplex.com, idol.sankakucomplex.com, and aibooru.online
+- Add support for other boorus. Currently planned supported URLs are: ~~danbooru.donmai.us~~, chan.sankakucomplex.com, idol.sankakucomplex.com, and ~~aibooru.online~~
 
 ## Version History
 - 1.0.0
@@ -16,3 +17,5 @@ Currently supported URLs:
     - Refactored to remove redundant URL check and updated gelbooru fetch user agent.
 - 1.2.0
     - Danbooru links are now supported.
+- 1.3.0
+    - AIbooru links are now supported.
