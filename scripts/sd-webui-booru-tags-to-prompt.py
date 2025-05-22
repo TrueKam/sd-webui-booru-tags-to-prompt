@@ -26,22 +26,28 @@ def on_ui_settings():
 
 def fetchTags(url):
     # Figure out which algorithm to use and fetch the necessary tags.
-    if "gelbooru.com/index.php" in url:
-        return fetchGelbooruTags(url)
+    if "aibooru.online/posts" in url:
+        return fetchAibooruTags(url)
+    
     elif "danbooru.donmai.us/posts" in url:
         return fetchDanbooruTags(url)
+    
+    elif "gelbooru.com/index.php" in url:
+        return fetchGelbooruTags(url)
+    
+    elif "rule34.xxx/index.php" in url:
+        return fetchRuleThirtyFourTags(url)
+    
     elif ("chan.sankakucomplex.com" in url) and ("posts" in url):
         # This conditional is pretty weird because Sankaku Complex adds "en" between the domain and /posts/.
-        # This way /should/ allow any language that they add in to function.
-        return "sankakuComplex Chan Url Entered; Not Yet Implemented"
+        # This way /should/ allow any language that they add into the function.
+        return fetchSankakuComplexChanTags(url)
+    
     elif ("idol.sankakucomplex.com" in url) and ("posts" in url):
         # This conditional is pretty weird because Sankaku Complex adds "en" between the domain and /posts/.
-        # This way /should/ allow any language that they add in to function.
-        return "sankakuComplex Idol Url Entered; Not Yet Implemented"
-    elif "aibooru.online/posts" in url:
-        return fetchAibooruTags(url)
-    elif "rule34.xxx/index.php" in url:
-        return "Rule34 Url Entered; Not Yet Implemented"
+        # This way /should/ allow any language that they add into the function.
+        return fetchSankakuComplexIdolTags(url)
+    
     else:
         return "Unsupported URL; Must be a post on gelbooru.com, danbooru.donmai.us, chan.sankakucomplex.com, idol.sankakucomplex.com, or aibooru.online"
 
@@ -149,6 +155,15 @@ def fetchGelbooruTags(url):
             parsed.append(tag)
         parsed = (", ").join(parsed)
         return (parsed)
+
+def fetchRuleThirtyFourTags(url)
+    return "Rule34 Url Entered; Not Yet Implemented"
+
+def fetchSankakuComplexChanTags(url)
+    return "sankakuComplex Chan Url Entered; Not Yet Implemented"
+
+def fetchSankakuComplexIdolTags(url)
+    return "sankakuComplex Idol Url Entered; Not Yet Implemented"
 
 class BooruPromptsScript(scripts.Script):
     def __init__(self) -> None:
