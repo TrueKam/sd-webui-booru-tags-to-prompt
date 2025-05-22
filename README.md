@@ -4,9 +4,10 @@ Currently supported URLs:
 - gelbooru.com
 - danbooru.donmai.us
 - aibooru.online
+- rule34.xxx
 
 ## Future Plans
-- Add support for other boorus. Currently planned supported URLs are: ~~danbooru.donmai.us~~, chan.sankakucomplex.com, idol.sankakucomplex.com, ~~aibooru.online~~, and rule34.xxx.
+- Add support for other boorus. Currently planned supported URLs are: ~~danbooru.donmai.us~~, chan.sankakucomplex.com, idol.sankakucomplex.com, ~~aibooru.online~~, and ~~rule34.xxx~~.
 
 ## Version History
 - 1.0.0
@@ -21,3 +22,5 @@ Currently supported URLs:
     - AIbooru links are now supported.
 - 1.3.1
     - Fixed typo causing Danbooru and AIbooru links containing URL query parameters (usually from site searches) causing errors when trying to fetch.
+- 1.4.0
+    - Added support for rule34.xxx links.
