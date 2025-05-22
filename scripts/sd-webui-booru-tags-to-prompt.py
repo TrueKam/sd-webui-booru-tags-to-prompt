@@ -1,7 +1,7 @@
 # Booru Tags to Prompt for Stable Diffusion WebUI Forge
 # Script by David R. Collins
 #
-# Version 1.3.0
+# Version 1.3.1
 # Released under the GNU General Public License Version 3, 29 June 2007
 #
 # Project based on ideas from danbooru-prompt by EnsignMK (https://github.com/EnsignMK/danbooru-prompt)
@@ -40,6 +40,8 @@ def fetchTags(url):
         return "sankakuComplex Idol Url Entered; Not Yet Implemented"
     elif "aibooru.online/posts" in url:
         return fetchAibooruTags(url)
+    elif "rule34.xxx/index.php" in url:
+        return "Rule34 Url Entered; Not Yet Implemented"
     else:
         return "Unsupported URL; Must be a post on gelbooru.com, danbooru.donmai.us, chan.sankakucomplex.com, idol.sankakucomplex.com, or aibooru.online"
 
@@ -48,7 +50,7 @@ def fetchAibooruTags(url):
     # Get the JSON contents of the post using the passed-in URL.
     if "?" in url:
         pos = url.find("?")
-        ch = url[:pos]
+        url = url[:pos]
     url = url + ".json"
     # Read the HTML content and parse it via BeautifulSoup.
     rawHtml = requests.get(url, headers={'user-agent': 'sd-webui-booru-tags-to-prompt/1.1.0'})
@@ -85,7 +87,7 @@ def fetchDanbooruTags(url):
     # Get the JSON contents of the post using the passed-in URL.
     if "?" in url:
         pos = url.find("?")
-        ch = url[:pos]
+        url = url[:pos]
     url = url + ".json"
     # Read the HTML content and parse it via BeautifulSoup.
     rawHtml = requests.get(url, headers={'user-agent': 'sd-webui-booru-tags-to-prompt/1.1.0'})
