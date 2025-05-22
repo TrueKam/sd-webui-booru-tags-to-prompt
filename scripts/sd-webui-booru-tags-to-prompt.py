@@ -1,7 +1,7 @@
 # Booru Tags to Prompt for Stable Diffusion WebUI Forge
 # Script by David R. Collins
 #
-# Version 1.3.1
+# Version 1.4.0
 # Released under the GNU General Public License Version 3, 29 June 2007
 #
 # Project based on ideas from danbooru-prompt by EnsignMK (https://github.com/EnsignMK/danbooru-prompt)
@@ -156,13 +156,28 @@ def fetchGelbooruTags(url):
         parsed = (", ").join(parsed)
         return (parsed)
 
-def fetchRuleThirtyFourTags(url)
-    return "Rule34 Url Entered; Not Yet Implemented"
+def fetchRuleThirtyFourTags(url):
+    
+    # Read the HTML content and parse it via BeautifulSoup.
+    rawHtml = requests.get(url, headers={'user-agent': 'sd-webui-booru-tags-to-prompt/1.1.0'}).text
+    parsedHtml = BeautifulSoup(rawHtml, 'html.parser')
 
-def fetchSankakuComplexChanTags(url)
+    imageElement = parsedHtml.find(attrs={"id" : "image"})
+
+    # imageElement now has the entire <img ... element in it. Get the tags from the "alt" attribute
+    # and properly format them.
+    parsedTags = []
+    for tag in imageElement["alt"].split():
+        tag = tag.replace("_", " ")
+        parsedTags.append(tag)
+    parsedTags = (", ").join(parsedTags)
+
+    return parsedTags
+
+def fetchSankakuComplexChanTags(url):
     return "sankakuComplex Chan Url Entered; Not Yet Implemented"
 
-def fetchSankakuComplexIdolTags(url)
+def fetchSankakuComplexIdolTags(url):
     return "sankakuComplex Idol Url Entered; Not Yet Implemented"
 
 class BooruPromptsScript(scripts.Script):
