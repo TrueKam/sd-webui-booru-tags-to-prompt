@@ -5,9 +5,15 @@ Currently supported URLs:
 - danbooru.donmai.us
 - aibooru.online
 - rule34.xxx
+- chan.sankakucomplex.com[1]
+- idol.sankakucomplex.com[1]
+
+[1]: Sankaku Complex requires the user log in to see the entire list of tags. This script currently does not support this functionality. I'd like to add it at a later point, but I don't feel that my Python skills are currently up to the task. I'm going to leave it as a todo item for later at this time. ~TrueKam
 
 ## Future Plans
-- Add support for other boorus. Currently planned supported URLs are: ~~danbooru.donmai.us~~, chan.sankakucomplex.com, idol.sankakucomplex.com, ~~aibooru.online~~, and ~~rule34.xxx~~.
+- All planned boorus are currently supported.
+- Allow name and password for sites that don't show all the tags for anonymous users. (Looking at you, Sankaku Complex.)
+    - To do this, I'll have to figure out how SD-WebUI handles creating settings pages so I don't have to force end users to manually edit this script since some might not have the level of comfort required to do so. It'll take some work, so it's currently back-burnered.
 
 ## Version History
 - 1.0.0
@@ -24,3 +30,5 @@ Currently supported URLs:
     - Fixed typo causing Danbooru and AIbooru links containing URL query parameters (usually from site searches) causing errors when trying to fetch.
 - 1.4.0
     - Added support for rule34.xxx links.
+- 1.5.0
+    - Added support for chan.sankakucomplex.com and idol.sankakucomplex.com.
