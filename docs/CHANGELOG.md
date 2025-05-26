@@ -1,0 +1,19 @@
+## Version History
+- 1.6.0
+    - Added support for safebooru.org URLs.
+- 1.5.0
+    - Added support for chan.sankakucomplex.com and idol.sankakucomplex.com.
+- 1.4.0
+    - Added support for rule34.xxx links.
+- 1.3.1
+    - Fixed typo causing Danbooru and AIbooru links containing URL query parameters (usually from site searches) causing errors when trying to fetch.
+- 1.3.0
+    - AIbooru links are now supported.
+- 1.2.0
+    - Danbooru links are now supported.
+- 1.1.5
+    - Refactored to remove redundant URL check and updated gelbooru fetch user agent.
+- 1.1.0
+    - Refactored functionality when button is pressed to parse the URL passed in before attempting to fetch. It still only supports gelbooru.com URLs, but the framework is now in place to allow the rest to be written.
+- 1.0.0
+    - Initial commit. Code functions perfectly well, but only supports gelbooru.com.
