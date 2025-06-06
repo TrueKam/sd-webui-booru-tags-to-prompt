@@ -4,10 +4,12 @@ Currently supported URLs:
 - aibooru.onling
 - chan.sankakucomplex.com [1]
 - danbooru.donmai.us
+- e621.net
 - gelbooru.com
 - idol.sankakucomplex.com [1]
 - safebooru.org
 - rule34.xxx
+- tbib.org
 
 [1]: Sankaku Complex requires the user log in to see the entire list of tags. This script currently does not support this functionality. I'd like to add it at a later point, but I don't feel that my Python skills are currently up to the task. I'm going to leave it as a todo item for later at this time. ~TrueKam
 
