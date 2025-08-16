@@ -1,7 +1,6 @@
 # Booru Tags to Prompt for Stable Diffusion WebUI Forge
 # Script by David R. Collins
 #
-# Version 1.6.1
 # Version 1.7.1
 # Released under the GNU General Public License Version 3, 29 June 2007
 #
