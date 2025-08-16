@@ -4,10 +4,12 @@ Currently supported URLs:
 - aibooru.onling
 - chan.sankakucomplex.com [1]
 - danbooru.donmai.us
+- e621.net
 - gelbooru.com
 - idol.sankakucomplex.com [1]
 - safebooru.org
 - rule34.xxx
+- tbib.org
 
 The idea for this script came from danbooru-prompt by EnsignMK (https://github.com/EnsignMK/danbooru-prompt). I wanted to use this functionality but also on other sites, so I coded up the algorithm while lamenting the fact that there isn't a universal API that would get this info. Obligatory XKCD: https://xkcd.com/927/ (The Stable Diffusion taggers work, but not really all that well when compared against a crowd-sourced set of tags.)
 

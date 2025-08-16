@@ -2,6 +2,7 @@
 # Script by David R. Collins
 #
 # Version 1.6.1
+# Version 1.7.1
 # Released under the GNU General Public License Version 3, 29 June 2007
 #
 # Project based on ideas from danbooru-prompt by EnsignMK (https://github.com/EnsignMK/danbooru-prompt)
@@ -17,6 +18,7 @@ from modules.shared import opts
 import requests
 import bs4
 from bs4 import BeautifulSoup
+from urllib.parse import unquote
 from urllib.parse import urlparse
 from urllib.parse import parse_qs
 from urllib.request import urlopen
@@ -31,6 +33,9 @@ def fetchTags(url):
     
     elif "danbooru.donmai.us/posts" in url:
         return fetchDanbooruTags(url)
+    
+    elif "e621.net/posts" in url:
+        return fetchESixTwoOneTags(url)
     
     elif "gelbooru.com/index.php" in url:
         return fetchGelbooruTags(url)
@@ -50,9 +55,12 @@ def fetchTags(url):
         # This conditional is pretty weird because Sankaku Complex adds "en" between the domain and /posts/.
         # This way /should/ allow any language that they add into the function.
         return fetchSankakuComplexIdolTags(url)
+
+    elif "tbib.org/index.php" in url:
+        return fetchTheBigImageBoardTags(url)
     
     else:
-        return "Unsupported URL; Must be a post on gelbooru.com, danbooru.donmai.us, chan.sankakucomplex.com, idol.sankakucomplex.com, or aibooru.online"
+        return "Unsupported URL; Must be a post on gelbooru.com, danbooru.donmai.us, chan.sankakucomplex.com, idol.sankakucomplex.com, rule34.xxx, safebooru.org, tbib.org, or aibooru.online"
 
 def fetchAibooruTags(url):
 
@@ -62,7 +70,7 @@ def fetchAibooruTags(url):
         url = url[:pos]
     url = url + ".json"
     # Read the HTML content and parse it via BeautifulSoup.
-    rawHtml = requests.get(url, headers={'user-agent': 'sd-webui-booru-tags-to-prompt/1.6.1'})
+    rawHtml = requests.get(url, headers={'user-agent': 'sd-webui-booru-tags-to-prompt/1.7.1'})
     parsedHtml = rawHtml.json()
 
     artistTag = parsedHtml["tag_string_artist"]
@@ -99,7 +107,7 @@ def fetchDanbooruTags(url):
         url = url[:pos]
     url = url + ".json"
     # Read the HTML content and parse it via BeautifulSoup.
-    rawHtml = requests.get(url, headers={'user-agent': 'sd-webui-booru-tags-to-prompt/1.6.1'})
+    rawHtml = requests.get(url, headers={'user-agent': 'sd-webui-booru-tags-to-prompt/1.7.1'})
     parsedHtml = rawHtml.json()
 
     artistTag = parsedHtml["tag_string_artist"]
@@ -128,10 +136,28 @@ def fetchDanbooruTags(url):
     print(outputTags)
     return outputTags
 
+def fetchESixTwoOneTags(url):
+
+    # Create the necessary cookie to prove we've verified we're over 18.
+    cookies = { 'Name':'gw', 'Value':'seen', 'Domain':'e621.net', 'Path':'/', 'HttpOnly':'false', 'Secure':'false', 'SameSite':'Lax'}
+
+    # Read the HTML content and parse it via BeautifulSoup.
+    rawHtml = requests.get(url, headers={'user-agent': 'sd-webui-booru-tags-to-prompt/1.7.0'}, cookies=cookies).text
+    parsedHtml = BeautifulSoup(rawHtml, 'html.parser')
+
+    parsedTags = []
+    tagElements = parsedHtml.find_all(attrs={"class" : "tag-list-item"})
+    for tag in tagElements:
+        thisTag=(unquote(tag['data-name'])).replace("_", " ")
+        parsedTags.extend([thisTag])
+
+    tagString = (", ").join(parsedTags).lower()
+    return (tagString)
+
 def fetchGelbooruTags(url):
 
     # Read the HTML content and parse it via BeautifulSoup.
-    rawHtml = requests.get(url, headers={'user-agent': 'sd-webui-booru-tags-to-prompt/1.6.1'}).text
+    rawHtml = requests.get(url, headers={'user-agent': 'sd-webui-booru-tags-to-prompt/1.7.1'}).text
     parsedHtml = BeautifulSoup(rawHtml, 'html.parser')
 
     # Parse the HTML to find the 'section' element that includes the 'data-md5' attribute, then extract that attribute
@@ -154,7 +180,7 @@ def fetchGelbooruTags(url):
 
 def fetchRuleThirtyFourTags(url):
     # Read the HTML content and parse it via BeautifulSoup.
-    rawHtml = requests.get(url, headers={'user-agent': 'sd-webui-booru-tags-to-prompt/1.6.1'}).text
+    rawHtml = requests.get(url, headers={'user-agent': 'sd-webui-booru-tags-to-prompt/1.7.1'}).text
     parsedHtml = BeautifulSoup(rawHtml, 'html.parser')
 
     imageElement = parsedHtml.find(attrs={"id" : "image"})
@@ -171,7 +197,7 @@ def fetchRuleThirtyFourTags(url):
 
 def fetchSafebooruTags(url):
     # Read the HTML content and parse it via BeautifulSoup.
-    rawHtml = requests.get(url, headers={'user-agent': 'sd-webui-booru-tags-to-prompt/1.6.1'}).text
+    rawHtml = requests.get(url, headers={'user-agent': 'sd-webui-booru-tags-to-prompt/1.7.1'}).text
     parsedHtml = BeautifulSoup(rawHtml, 'html.parser')
 
     imageElement = parsedHtml.find(attrs={"id" : "image"})
@@ -188,7 +214,7 @@ def fetchSafebooruTags(url):
 
 def fetchSankakuComplexChanTags(url):
     # Read the HTML content and parse it via BeautifulSoup.
-    rawHtml = requests.get(url, headers={'user-agent': 'sd-webui-booru-tags-to-prompt/1.6.1'}).text
+    rawHtml = requests.get(url, headers={'user-agent': 'sd-webui-booru-tags-to-prompt/1.7.1'}).text
     parsedHtml = BeautifulSoup(rawHtml, 'html.parser')
 
     parsedTags = []
@@ -201,7 +227,7 @@ def fetchSankakuComplexChanTags(url):
 
 def fetchSankakuComplexIdolTags(url):
     # Read the HTML content and parse it via BeautifulSoup.
-    rawHtml = requests.get(url, headers={'user-agent': 'sd-webui-booru-tags-to-prompt/1.6.1'}).text
+    rawHtml = requests.get(url, headers={'user-agent': 'sd-webui-booru-tags-to-prompt/1.7.1'}).text
     parsedHtml = BeautifulSoup(rawHtml, 'html.parser')
 
     parsedTags = []
@@ -211,6 +237,19 @@ def fetchSankakuComplexIdolTags(url):
     tagString = (", ").join(parsedTags).lower()
     
     return tagString
+
+def fetchTheBigImageBoardTags(url):
+    # Read the HTML content and parse it via BeautifulSoup.
+    rawHtml = requests.get(url, headers={'user-agent': 'sd-webui-booru-tags-to-prompt/1.7.0'}).text
+    parsedHtml = BeautifulSoup(rawHtml, 'html.parser')
+
+    parsedTags = []
+    tagElements = parsedHtml.find_all(attrs={"class" : "tag"})
+    for tag in tagElements:
+        parsedTags.extend([tag.find('a').text])
+        
+    tagString = (", ").join(parsedTags).lower()
+    return (tagString)
 
 class BooruPromptsScript(scripts.Script):
     def __init__(self) -> None:
