@@ -9,6 +9,8 @@ Currently supported URLs:
 - safebooru.org
 - rule34.xxx
 
+The idea for this script came from danbooru-prompt by EnsignMK (https://github.com/EnsignMK/danbooru-prompt). I wanted to use this functionality but also on other sites, so I coded up the algorithm while lamenting the fact that there isn't a universal API that would get this info. Obligatory XKCD: https://xkcd.com/927/ (The Stable Diffusion taggers work, but not really all that well when compared against a crowd-sourced set of tags.)
+
 [1]: Sankaku Complex requires the user log in to see the entire list of tags. This script currently does not support this functionality. I'd like to add it at a later point, but I don't feel that my Python skills are currently up to the task. I'm going to leave it as a todo item for later at this time. ~TrueKam
 
 ## Future Plans

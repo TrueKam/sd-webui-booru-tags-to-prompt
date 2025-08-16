@@ -1,7 +1,7 @@
 # Booru Tags to Prompt for Stable Diffusion WebUI Forge
 # Script by David R. Collins
 #
-# Version 1.6.0
+# Version 1.6.1
 # Released under the GNU General Public License Version 3, 29 June 2007
 #
 # Project based on ideas from danbooru-prompt by EnsignMK (https://github.com/EnsignMK/danbooru-prompt)
@@ -62,7 +62,7 @@ def fetchAibooruTags(url):
         url = url[:pos]
     url = url + ".json"
     # Read the HTML content and parse it via BeautifulSoup.
-    rawHtml = requests.get(url, headers={'user-agent': 'sd-webui-booru-tags-to-prompt/1.6.0'})
+    rawHtml = requests.get(url, headers={'user-agent': 'sd-webui-booru-tags-to-prompt/1.6.1'})
     parsedHtml = rawHtml.json()
 
     artistTag = parsedHtml["tag_string_artist"]
@@ -99,7 +99,7 @@ def fetchDanbooruTags(url):
         url = url[:pos]
     url = url + ".json"
     # Read the HTML content and parse it via BeautifulSoup.
-    rawHtml = requests.get(url, headers={'user-agent': 'sd-webui-booru-tags-to-prompt/1.6.0'})
+    rawHtml = requests.get(url, headers={'user-agent': 'sd-webui-booru-tags-to-prompt/1.6.1'})
     parsedHtml = rawHtml.json()
 
     artistTag = parsedHtml["tag_string_artist"]
@@ -131,37 +131,30 @@ def fetchDanbooruTags(url):
 def fetchGelbooruTags(url):
 
     # Read the HTML content and parse it via BeautifulSoup.
-    rawHtml = requests.get(url, headers={'user-agent': 'sd-webui-booru-tags-to-prompt/1.6.0'}).text
+    rawHtml = requests.get(url, headers={'user-agent': 'sd-webui-booru-tags-to-prompt/1.6.1'}).text
     parsedHtml = BeautifulSoup(rawHtml, 'html.parser')
 
     # Parse the HTML to find the 'section' element that includes the 'data-md5' attribute, then extract that attribute
     # as the image hash in question.
     imageSection = parsedHtml.body.find('section', {"data-md5": True})
-    imageHash = imageSection['data-md5']
+    imageTags = imageSection['data-tags']
 
-    # Now that the image hash is found, use that to get the post's JSON.
-    gelbooruUrl = "https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&tags=md5:" + imageHash
-
-    # Original code from sd-webui-gelbooru-prompt project follows.
-    req = requests.get(gelbooruUrl)
-    data = req.json()
-    
-    if data["@attributes"]["count"] > 1:
-        return ("No image found with that hash.")
+    if not imageTags:
+        return ("No tags found for the image at that URL.")
     else:
-        post = data["post"][0]
-        tags = post["tags"]
-
-        parsed = []
-        for tag in tags.split():
-            tag = tag.replace("_", " ")
-            parsed.append(tag)
-        parsed = (", ").join(parsed)
-        return (parsed)
+        # Clean up the tag output.
+        imageTags = imageTags.strip()
+        imageTags = imageTags.replace(" ", ", ")
+        imageTags = imageTags.replace("_", " ")
+        imageTags = imageTags.replace("(", "\(")
+        imageTags = imageTags.replace(")", "\)")
+        imageTags = imageTags.replace("[", "\[")
+        imageTags = imageTags.replace("]", "\]")
+        return (imageTags)
 
 def fetchRuleThirtyFourTags(url):
     # Read the HTML content and parse it via BeautifulSoup.
-    rawHtml = requests.get(url, headers={'user-agent': 'sd-webui-booru-tags-to-prompt/1.6.0'}).text
+    rawHtml = requests.get(url, headers={'user-agent': 'sd-webui-booru-tags-to-prompt/1.6.1'}).text
     parsedHtml = BeautifulSoup(rawHtml, 'html.parser')
 
     imageElement = parsedHtml.find(attrs={"id" : "image"})
@@ -178,7 +171,7 @@ def fetchRuleThirtyFourTags(url):
 
 def fetchSafebooruTags(url):
     # Read the HTML content and parse it via BeautifulSoup.
-    rawHtml = requests.get(url, headers={'user-agent': 'sd-webui-booru-tags-to-prompt/1.6.0'}).text
+    rawHtml = requests.get(url, headers={'user-agent': 'sd-webui-booru-tags-to-prompt/1.6.1'}).text
     parsedHtml = BeautifulSoup(rawHtml, 'html.parser')
 
     imageElement = parsedHtml.find(attrs={"id" : "image"})
@@ -195,7 +188,7 @@ def fetchSafebooruTags(url):
 
 def fetchSankakuComplexChanTags(url):
     # Read the HTML content and parse it via BeautifulSoup.
-    rawHtml = requests.get(url, headers={'user-agent': 'sd-webui-booru-tags-to-prompt/1.6.0'}).text
+    rawHtml = requests.get(url, headers={'user-agent': 'sd-webui-booru-tags-to-prompt/1.6.1'}).text
     parsedHtml = BeautifulSoup(rawHtml, 'html.parser')
 
     parsedTags = []
@@ -208,7 +201,7 @@ def fetchSankakuComplexChanTags(url):
 
 def fetchSankakuComplexIdolTags(url):
     # Read the HTML content and parse it via BeautifulSoup.
-    rawHtml = requests.get(url, headers={'user-agent': 'sd-webui-booru-tags-to-prompt/1.6.0'}).text
+    rawHtml = requests.get(url, headers={'user-agent': 'sd-webui-booru-tags-to-prompt/1.6.1'}).text
     parsedHtml = BeautifulSoup(rawHtml, 'html.parser')
 
     parsedTags = []

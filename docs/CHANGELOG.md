@@ -1,4 +1,6 @@
 ## Version History
+- 1.6.1
+    - Gelbooru removed (or changed the URL for, or simply changed permissions for) their API, so the method I was using to get the tags no longer works. Reworked the algorithm to get the tags so it just uses the originally downloaded HTML instead of parsing that for the image's hash then contacting the API. The API was more elegant, but technically caused a second web call so this is a faster solution.
 - 1.6.0
     - Added support for safebooru.org URLs.
 - 1.5.0
