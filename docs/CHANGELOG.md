@@ -1,6 +1,8 @@
 ## Version History
+- 1.7.2
+  - Fixed calls for sites using index.php to not require the URL to explicitly include "index.php" in them so the web server can automatically resolve this and links copied/shared from apps like Boorusama will function properly.
 - 1.7.1
-    - Gelbooru removed (or changed the URL for, or simply changed permissions for) their API, so the method I was using to get the tags no longer works. Reworked the algorithm to get the tags so it just uses the originally downloaded HTML instead of parsing that for the image's hash then contacting the API. The API was more elegant, but technically caused a second web call so this is a faster solution.
+  - Gelbooru removed (or changed the URL for, or simply changed permissions for) their API, so the method I was using to get the tags no longer works. Reworked the algorithm to get the tags so it just uses the originally downloaded HTML instead of parsing that for the image's hash then contacting the API. The API was more elegant, but technically caused a second web call so this is a faster solution.
 - 1.7.0
   - Added support for tbib.org (The Big Image Board) and e621.net.
 - 1.6.0
