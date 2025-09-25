@@ -1,7 +1,7 @@
 # BooruLinkPrompt
 A StableDiffusion-WebUI Forge script to get a list of tags from supported image boards and add to a prompt.
 Currently supported URLs:
-- aibooru.onling
+- aibooru.online
 - chan.sankakucomplex.com [1]
 - danbooru.donmai.us
 - e621.net
