@@ -1,4 +1,7 @@
 ## Version History
+- 1.7.3
+  - Fixed calls for rule34.xxx. It now goes through the site's API instead of just directly pulling the HTML. This is a cleaner solution, but requires the user to add their API user ID and key to the script.
+  - Converted the calls for rule34.xxx to use the httpx library. Ensure your installation has httpx and httpx[http2] installed.
 - 1.7.2
   - Fixed calls for sites using index.php to not require the URL to explicitly include "index.php" in them so the web server can automatically resolve this and links copied/shared from apps like Boorusama will function properly.
 - 1.7.1
