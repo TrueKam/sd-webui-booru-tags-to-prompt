@@ -1,1 +1,4 @@
 /.vscode
+
+# I use this filename for local script testing prior to testing in my SDWeb-UI instance. It doesn't need to ever be committed.
+testScript.py
