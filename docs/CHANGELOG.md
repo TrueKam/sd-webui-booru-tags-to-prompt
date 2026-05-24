@@ -1,4 +1,7 @@
 ## Version History
+- 1.8.0
+  - Streamlined and refactored some of the code so the fetching code is common between all the different sites supported.
+  - Added additional documentation to the script itself to hopefully provide some further information to anyone deciding to extend, update, or fork the script.
 - 1.7.3
   - Fixed calls for rule34.xxx. It now goes through the site's API instead of just directly pulling the HTML. This is a cleaner solution, but requires the user to add their API user ID and key to the script.
   - Converted the calls for rule34.xxx to use the httpx library. Ensure your installation has httpx and httpx[http2] installed.
