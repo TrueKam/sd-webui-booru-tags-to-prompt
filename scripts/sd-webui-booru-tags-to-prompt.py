@@ -1,10 +1,12 @@
 # Booru Tags to Prompt for Stable Diffusion WebUI Forge
 # Script by David R. Collins
 #
-# Version 1.7.3
+# Version 1.8.0
 # Released under the GNU General Public License Version 3, 29 June 2007
 #
 # Project based on ideas from danbooru-prompt by EnsignMK (https://github.com/EnsignMK/danbooru-prompt)
+
+# Imports mainly used for SD-WebUI.
 import random
 import re
 import traceback
@@ -14,10 +16,9 @@ import contextlib
 
 from modules import script_callbacks, scripts, shared
 from modules.shared import opts
-import requests
-import json
+
+# Imports primarily for script usage.
 import httpx
-import bs4
 from bs4 import BeautifulSoup
 from urllib.parse import unquote
 from urllib.parse import urlparse
@@ -30,12 +31,27 @@ from urllib.request import urlopen
 rule34_apiUser = "0000"
 rule34_apiKey  = "0000"
 
-scriptUserAgent = "sd-webui-booru-tags-to-prompt/1.7.3"
+scriptUserAgent = "sd-webui-booru-tags-to-prompt/1.8.0"
 
 def on_ui_settings():
     section = ('booru-tags-to-prompt', "Booru Link")
 
 def fetchTags(url):
+    """ fetchTags(url)
+
+    This is where the main functionality of the script is kicked off. This function
+    takes the URL the user entered and figures out which site it should try to fetch
+    tags from before calling the specific function for that site. If the site isn't
+    found, it returns an error message into the prompt box.
+
+    Args:
+        url (str): The user-provided URL to fetch.
+
+    Returns:
+        [string]: A string containing either a comma-separated list of tags found at the provided URL or an error message if the URL is invalid.
+
+    """
+
     # Figure out which algorithm to use and fetch the necessary tags.
     if "aibooru.online/posts" in url:
         return fetchAibooruTags(url)
@@ -60,7 +76,7 @@ def fetchTags(url):
         # This way /should/ allow any language that they add into the function.
         return fetchSankakuComplexChanTags(url)
     
-    elif ("idol.sankakucomplex.com" in url) and ("posts" in url):
+    elif ("idolcomplex.com" in url) and ("posts" in url):
         # This conditional is pretty weird because Sankaku Complex adds "en" between the domain and /posts/.
         # This way /should/ allow any language that they add into the function.
         return fetchSankakuComplexIdolTags(url)
@@ -69,17 +85,32 @@ def fetchTags(url):
         return fetchTheBigImageBoardTags(url)
     
     else:
-        return "Unsupported URL; Must be a post on gelbooru.com, danbooru.donmai.us, chan.sankakucomplex.com, idol.sankakucomplex.com, rule34.xxx, safebooru.org, tbib.org, or aibooru.online"
+        return "Unsupported URL; Must be a post on gelbooru.com, danbooru.donmai.us, chan.sankakucomplex.com, idolcomplex.com, rule34.xxx, safebooru.org, tbib.org, or aibooru.online"
 
 def fetchAibooruTags(url):
+    """ fetchAibooruTags(url)
 
-    # Get the JSON contents of the post using the passed-in URL.
+    Updates the URL to point to AIBooru's JSON post data page instead of the post page
+    if necessary. Then get the contents of the post data and parse out the tags to
+    return to the frontend.
+
+    Args:
+        url (str): The URL on aibooru.online to fetch.
+
+    Returns:
+        outputTags: A comma-separated list of formatted tags.
+
+    """
+
+    # Update the URL so it points to the JSON post contents instead of the
+    # main page to save just a little bit of bandwidth.
     if "?" in url:
         pos = url.find("?")
         url = url[:pos]
     url = url + ".json"
-    # Read the HTML content and parse it via BeautifulSoup.
-    rawHtml = requests.get(url, headers={'user-agent': scriptUserAgent})
+    
+    # Get the contents from the URL and parse it as JSON.
+    rawHtml = fetchUrlContents(url)
     parsedHtml = rawHtml.json()
 
     artistTag = parsedHtml["tag_string_artist"]
@@ -88,7 +119,7 @@ def fetchAibooruTags(url):
     metaTags = parsedHtml["tag_string_meta"]
     generalTags = parsedHtml["tag_string_general"]
 
-    # Add the known values of the tags to the list. This is currently broken up because Danbooru makes it easy and doing
+    # Add the known values of the tags to the list. This is currently broken up because AIBooru makes it easy and doing
     # it this way allows optionally removing the artist and character tags later easier. I don't want to implement this
     # until I have a good way to do it for all boorus, though.
     outputTags = ""
@@ -105,18 +136,33 @@ def fetchAibooruTags(url):
     outputTags = outputTags.replace(")", "\)")
     outputTags = outputTags.replace("[", "\[")
     outputTags = outputTags.replace("]", "\]")
-    print(outputTags)
+
     return outputTags
 
 def fetchDanbooruTags(url):
+    """ fetchDanbooruTags(url)
 
-    # Get the JSON contents of the post using the passed-in URL.
+    Updates the URL to point to Danbooru's JSON post data page instead of the post page
+    if necessary. Then get the contents of the post data and parse out the tags to
+    return to the frontend.
+
+    Args:
+        url (str): The URL on danbooru.donmai.us to fetch.
+
+    Returns:
+        outputTags: A comma-separated list of formatted tags.
+
+    """
+
+    # Update the URL so it points to the JSON post contents instead of the
+    # main page to save just a little bit of bandwidth.
     if "?" in url:
         pos = url.find("?")
         url = url[:pos]
     url = url + ".json"
-    # Read the HTML content and parse it via BeautifulSoup.
-    rawHtml = requests.get(url, headers={'user-agent': scriptUserAgent})
+    
+    # Get the contents from the URL and parse it as JSON.
+    rawHtml = fetchUrlContents(url)
     parsedHtml = rawHtml.json()
 
     artistTag = parsedHtml["tag_string_artist"]
@@ -142,17 +188,25 @@ def fetchDanbooruTags(url):
     outputTags = outputTags.replace(")", "\)")
     outputTags = outputTags.replace("[", "\[")
     outputTags = outputTags.replace("]", "\]")
-    print(outputTags)
+
     return outputTags
 
 def fetchESixTwoOneTags(url):
+    """ fetchESixTwoOneTags(url)
 
-    # Create the necessary cookie to prove we've verified we're over 18.
-    cookies = { 'Name':'gw', 'Value':'seen', 'Domain':'e621.net', 'Path':'/', 'HttpOnly':'false', 'Secure':'false', 'SameSite':'Lax'}
+    Fetches the HTML contents found at the provided URL and parses the tags from it.
+
+    Args:
+        url (str): The URL on e621.net to fetch.
+
+    Returns:
+        tagString: A comma-separated list of formatted tags.
+
+    """
 
     # Read the HTML content and parse it via BeautifulSoup.
-    rawHtml = requests.get(url, headers={'user-agent': scriptUserAgent}, cookies=cookies).text
-    parsedHtml = BeautifulSoup(rawHtml, 'html.parser')
+    rawHtml = fetchUrlContents(url)
+    parsedHtml = BeautifulSoup(rawHtml.text, 'html.parser')
 
     parsedTags = []
     tagElements = parsedHtml.find_all(attrs={"class" : "tag-list-item"})
@@ -164,10 +218,21 @@ def fetchESixTwoOneTags(url):
     return (tagString)
 
 def fetchGelbooruTags(url):
+    """ fetchGelbooruTags(url)
+
+    Fetches the HTML contents found at the provided URL and parses the tags from it.
+
+    Args:
+        url (str): The URL on gelbooru.com to fetch.
+
+    Returns:
+        imageTags: A comma-separated list of formatted tags.
+
+    """
 
     # Read the HTML content and parse it via BeautifulSoup.
-    rawHtml = requests.get(url, headers={'user-agent': scriptUserAgent}).text
-    parsedHtml = BeautifulSoup(rawHtml, 'html.parser')
+    rawHtml = fetchUrlContents(url)
+    parsedHtml = BeautifulSoup(rawHtml.text, 'html.parser')
 
     # Parse the HTML to find the 'section' element that includes the 'data-md5' attribute, then extract that attribute
     # as the image hash in question.
@@ -188,15 +253,27 @@ def fetchGelbooruTags(url):
         return (imageTags)
 
 def fetchRuleThirtyFourTags(url):
+    """ fetchRuleThirtyFourTags(url)
+
+    Updates the URL to point to Rule34's JSON post data page instead of the post page
+    and add the user's ID and API key, then fetches the data and parses the tag from
+    the page.
+
+    Args:
+        url (str): The URL on rule34.xxx to fetch.
+
+    Returns:
+        parsedTags: A comma-separated list of formatted tags.
+
+    """
+
     # Convert the URL to the API address and add the user's ID and API key.
     parsedUrl = urlparse(url)
     postId = parse_qs(parsedUrl.query)['id'][0]
-
     apiUrl = "https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&limit=1&json=1&id=" + postId +"&api_key=" + rule34_apiKey + "&user_id=" + rule34_apiUser
-    client = httpx.Client(http2=True, headers={'user-agent': scriptUserAgent},follow_redirects=True);
 
     # Read the post content via the API and parse it as JSON.
-    response = client.get(apiUrl)
+    response = fetchUrlContents(apiUrl)
     parsedJson = response.json()
 
     parsedTags = []
@@ -204,14 +281,24 @@ def fetchRuleThirtyFourTags(url):
         parsedTags.append(tag)
     parsedTags = (", ").join(parsedTags)
 
-    client.close()
-
     return parsedTags
 
 def fetchSafebooruTags(url):
+    """ fetchSafebooruTags(url)
+
+    Fetches the HTML contents found at the provided URL and parses the tags from it.
+
+    Args:
+        url (str): The URL on safebooru.org to fetch.
+
+    Returns:
+        parsedTags: A comma-separated list of formatted tags.
+
+    """
+
     # Read the HTML content and parse it via BeautifulSoup.
-    rawHtml = requests.get(url, headers={'user-agent': 'sd-webui-booru-tags-to-prompt/1.7.2'}).text
-    parsedHtml = BeautifulSoup(rawHtml, 'html.parser')
+    rawHtml = fetchUrlContents(url)
+    parsedHtml = BeautifulSoup(rawHtml.text, 'html.parser')
 
     imageElement = parsedHtml.find(attrs={"id" : "image"})
 
@@ -226,9 +313,23 @@ def fetchSafebooruTags(url):
     return parsedTags
 
 def fetchSankakuComplexChanTags(url):
+    """ fetchSankakuComplexChanTags(url)
+
+    Fetches the HTML contents found at the provided URL and parses the tags from it. Note
+    that currently, the data returned from chan.sankakucomplex.com is generally empty and
+    contains no tags to parse.
+
+    Args:
+        url (str): The URL on chan.sankakucomplex.com to fetch.
+
+    Returns:
+        tagString: A comma-separated list of formatted tags.
+
+    """
+
     # Read the HTML content and parse it via BeautifulSoup.
-    rawHtml = requests.get(url, headers={'user-agent': scriptUserAgent}).text
-    parsedHtml = BeautifulSoup(rawHtml, 'html.parser')
+    rawHtml = fetchUrlContents(url)
+    parsedHtml = BeautifulSoup(rawHtml.text, 'html.parser')
 
     parsedTags = []
     tagElements = parsedHtml.find_all(attrs={"class" : "tag-link"})
@@ -239,9 +340,23 @@ def fetchSankakuComplexChanTags(url):
     return tagString
 
 def fetchSankakuComplexIdolTags(url):
+    """ fetchSankakuComplexIdolTags(url)
+
+    Fetches the HTML contents found at the provided URL and parses the tags from it. Note
+    that currently, the data returned from idolcomplex.com is generally empty and
+    contains no tags to parse.
+
+    Args:
+        url (str): The URL on idolcomplex.com to fetch.
+
+    Returns:
+        tagString: A comma-separated list of formatted tags.
+
+    """
+
     # Read the HTML content and parse it via BeautifulSoup.
-    rawHtml = requests.get(url, headers={'user-agent': scriptUserAgent}).text
-    parsedHtml = BeautifulSoup(rawHtml, 'html.parser')
+    rawHtml = fetchUrlContents(url)
+    parsedHtml = BeautifulSoup(rawHtml.text, 'html.parser')
 
     parsedTags = []
     tagElements = parsedHtml.find_all(attrs={"class" : "tag-link"})
@@ -252,9 +367,21 @@ def fetchSankakuComplexIdolTags(url):
     return tagString
 
 def fetchTheBigImageBoardTags(url):
+    """ fetchTheBigImageBoardTags(url)
+
+    Fetches the HTML contents found at the provided URL and parses the tags from it.
+
+    Args:
+        url (str): The URL on tbib.org to fetch.
+
+    Returns:
+        tagString: A comma-separated list of formatted tags.
+
+    """
+
     # Read the HTML content and parse it via BeautifulSoup.
-    rawHtml = requests.get(url, headers={'user-agent': scriptUserAgent}).text
-    parsedHtml = BeautifulSoup(rawHtml, 'html.parser')
+    rawHtml = fetchUrlContents(url)
+    parsedHtml = BeautifulSoup(rawHtml.text, 'html.parser')
 
     parsedTags = []
     tagElements = parsedHtml.find_all(attrs={"class" : "tag"})
@@ -263,6 +390,40 @@ def fetchTheBigImageBoardTags(url):
         
     tagString = (", ").join(parsedTags).lower()
     return (tagString)
+
+def fetchUrlContents(url):
+    """ fetchUrlContents(url)
+
+    Uses the httpx library to fetch the contents of the URL passed into the
+    function and returns the response in raw form. Choice of how to parse that
+    response is up to the individual parsing functions due to the different
+    supported sites potentially requiring different functionality.
+
+    Args:
+        url (str): The pre-parsed and formatted URL to fetch.
+
+    Returns:
+        response: An httpx Response containing the data found at the fetched URL.
+
+    """
+    # Create the necessary cookies for our session.
+    
+    cookies = {
+        # First one is for e621 to prove we've verified we're over 18.
+        'Name':'gw', 'Value':'seen', 'Domain':'e621.net', 'Path':'/', 'HttpOnly':'false', 'Secure':'false', 'SameSite':'Lax'
+        # More can be added as necessary. Don't forget a trailing comma on the previous line.
+        #'Name':'whatever', 'Value':'nah', etc.
+        }
+    
+    client = httpx.Client(http2=True, headers={'user-agent': scriptUserAgent},follow_redirects=True,cookies=cookies);
+
+    # Read the post content via httpx and save it to 'response.' No error processing
+    # is being done here.
+    response = client.get(url)
+
+    client.close()
+
+    return response
 
 class BooruPromptsScript(scripts.Script):
     def __init__(self) -> None:
