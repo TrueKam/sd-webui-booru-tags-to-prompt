@@ -1,7 +1,7 @@
 # Booru Tags to Prompt for Stable Diffusion WebUI Forge
 # Script by David R. Collins
 #
-# Version 1.8.0
+# Version 1.8.1
 # Released under the GNU General Public License Version 3, 29 June 2007
 #
 # Project based on ideas from danbooru-prompt by EnsignMK (https://github.com/EnsignMK/danbooru-prompt)
@@ -31,7 +31,7 @@ from urllib.request import urlopen
 rule34_apiUser = "0000"
 rule34_apiKey  = "0000"
 
-scriptUserAgent = "sd-webui-booru-tags-to-prompt/1.8.0"
+scriptUserAgent = "sd-webui-booru-tags-to-prompt/1.8.1"
 
 def on_ui_settings():
     section = ('booru-tags-to-prompt', "Booru Link")
@@ -65,6 +65,9 @@ def fetchTags(url):
     elif "gelbooru.com" in url:
         return fetchGelbooruTags(url)
     
+    elif "rule34.paheal.net/post" in url:
+        return fetchRuleThirtyFourPahealTags(url)
+    
     elif "rule34.xxx" in url:
         return fetchRuleThirtyFourTags(url)
     
@@ -85,7 +88,7 @@ def fetchTags(url):
         return fetchTheBigImageBoardTags(url)
     
     else:
-        return "Unsupported URL; Must be a post on gelbooru.com, danbooru.donmai.us, chan.sankakucomplex.com, idolcomplex.com, rule34.xxx, safebooru.org, tbib.org, or aibooru.online"
+        return "Unsupported URL: Must be a post on gelbooru.com, danbooru.donmai.us, chan.sankakucomplex.com, idolcomplex.com, rule34.paheal.net, rule34.xxx, safebooru.org, tbib.org, or aibooru.online"
 
 def fetchAibooruTags(url):
     """ fetchAibooruTags(url)
@@ -282,6 +285,31 @@ def fetchRuleThirtyFourTags(url):
     parsedTags = (", ").join(parsedTags)
 
     return parsedTags
+
+def fetchRuleThirtyFourPahealTags(url):
+    """ fetchRuleThirtyFourPahealTags(url)
+
+    Fetches the HTML contents found at the provided URL and parses the tags from it.
+
+    Args:
+        url (str): The URL on safebooru.org to fetch.
+
+    Returns:
+        parsedTags: A comma-separated list of formatted tags.
+
+    """
+
+    # Read the HTML content and parse it via BeautifulSoup.
+    rawHtml = fetchUrlContents(url)
+    parsedHtml = BeautifulSoup(rawHtml.text, 'html.parser')
+
+    parsedTags = []
+    tagElements = parsedHtml.find_all(attrs={"class" : "tag_name"})
+    for tag in tagElements:
+        parsedTags.extend(tag.contents)
+    tagString = (", ").join(parsedTags).lower()
+    
+    return tagString
 
 def fetchSafebooruTags(url):
     """ fetchSafebooruTags(url)
