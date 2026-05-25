@@ -1,4 +1,6 @@
 ## Version History
+- 1.8.1
+  - Added support for rule34.paheal.net post URLs.
 - 1.8.0
   - Streamlined and refactored some of the code so the fetching code is common between all the different sites supported.
   - Added additional documentation to the script itself to hopefully provide some further information to anyone deciding to extend, update, or fork the script.
