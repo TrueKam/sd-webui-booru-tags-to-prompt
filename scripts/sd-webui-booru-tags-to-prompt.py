@@ -1,7 +1,7 @@
 # Booru Tags to Prompt for Stable Diffusion WebUI Forge
 # Script by David R. Collins
 #
-# Version 1.8.1
+# Version 1.8.2
 # Released under the GNU General Public License Version 3, 29 June 2007
 #
 # Project based on ideas from danbooru-prompt by EnsignMK (https://github.com/EnsignMK/danbooru-prompt)
@@ -18,6 +18,7 @@ from modules import script_callbacks, scripts, shared
 from modules.shared import opts
 
 # Imports primarily for script usage.
+import html
 import httpx
 from bs4 import BeautifulSoup
 from urllib.parse import unquote
@@ -31,7 +32,7 @@ from urllib.request import urlopen
 rule34_apiUser = "0000"
 rule34_apiKey  = "0000"
 
-scriptUserAgent = "sd-webui-booru-tags-to-prompt/1.8.1"
+scriptUserAgent = "sd-webui-booru-tags-to-prompt/1.8.2"
 
 def on_ui_settings():
     section = ('booru-tags-to-prompt', "Booru Link")
@@ -140,7 +141,7 @@ def fetchAibooruTags(url):
     outputTags = outputTags.replace("[", "\[")
     outputTags = outputTags.replace("]", "\]")
 
-    return outputTags
+    return html.unescape(outputTags)
 
 def fetchDanbooruTags(url):
     """ fetchDanbooruTags(url)
@@ -192,7 +193,7 @@ def fetchDanbooruTags(url):
     outputTags = outputTags.replace("[", "\[")
     outputTags = outputTags.replace("]", "\]")
 
-    return outputTags
+    return html.unescape(outputTags)
 
 def fetchESixTwoOneTags(url):
     """ fetchESixTwoOneTags(url)
@@ -218,7 +219,7 @@ def fetchESixTwoOneTags(url):
         parsedTags.extend([thisTag])
 
     tagString = (", ").join(parsedTags).lower()
-    return (tagString)
+    return html.unescape(tagString)
 
 def fetchGelbooruTags(url):
     """ fetchGelbooruTags(url)
@@ -253,7 +254,7 @@ def fetchGelbooruTags(url):
         imageTags = imageTags.replace(")", "\)")
         imageTags = imageTags.replace("[", "\[")
         imageTags = imageTags.replace("]", "\]")
-        return (imageTags)
+        return html.unescape(imageTags)
 
 def fetchRuleThirtyFourTags(url):
     """ fetchRuleThirtyFourTags(url)
@@ -284,7 +285,14 @@ def fetchRuleThirtyFourTags(url):
         parsedTags.append(tag)
     parsedTags = (", ").join(parsedTags)
 
-    return parsedTags
+    # Clean up the tags so they can be dropped into the prompt.
+    parsedTags = parsedTags.replace("_", " ")
+    parsedTags = parsedTags.replace("(", "\(")
+    parsedTags = parsedTags.replace(")", "\)")
+    parsedTags = parsedTags.replace("[", "\[")
+    parsedTags = parsedTags.replace("]", "\]")
+
+    return html.unescape(parsedTags)
 
 def fetchRuleThirtyFourPahealTags(url):
     """ fetchRuleThirtyFourPahealTags(url)
@@ -309,7 +317,7 @@ def fetchRuleThirtyFourPahealTags(url):
         parsedTags.extend(tag.contents)
     tagString = (", ").join(parsedTags).lower()
     
-    return tagString
+    return html.unescape(tagString)
 
 def fetchSafebooruTags(url):
     """ fetchSafebooruTags(url)
@@ -338,7 +346,7 @@ def fetchSafebooruTags(url):
         parsedTags.append(tag)
     parsedTags = (", ").join(parsedTags)
 
-    return parsedTags
+    return html.unescape(parsedTags)
 
 def fetchSankakuComplexChanTags(url):
     """ fetchSankakuComplexChanTags(url)
@@ -365,7 +373,7 @@ def fetchSankakuComplexChanTags(url):
         parsedTags.extend(tag.contents)
     tagString = (", ").join(parsedTags).lower()
     
-    return tagString
+    return html.unescape(tagString)
 
 def fetchSankakuComplexIdolTags(url):
     """ fetchSankakuComplexIdolTags(url)
@@ -392,7 +400,7 @@ def fetchSankakuComplexIdolTags(url):
         parsedTags.extend(tag.contents)
     tagString = (", ").join(parsedTags).lower()
     
-    return tagString
+    return html.unescape(tagString)
 
 def fetchTheBigImageBoardTags(url):
     """ fetchTheBigImageBoardTags(url)
@@ -417,7 +425,7 @@ def fetchTheBigImageBoardTags(url):
         parsedTags.extend([tag.find('a').text])
         
     tagString = (", ").join(parsedTags).lower()
-    return (tagString)
+    return html.unescape(tagString)
 
 def fetchUrlContents(url):
     """ fetchUrlContents(url)

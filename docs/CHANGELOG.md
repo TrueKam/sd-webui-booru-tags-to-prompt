@@ -1,4 +1,7 @@
 ## Version History
+- 1.8.2
+  - Updated the returned tag string for rule34.xxx to correct issues lost in the previous rewrite with regard to things like replacing underscores in tags with spaces.
+  - Perform an HTML unescape call on the returned strings to replace HTML escape characters. This does not fix string escape characters such as "\(".
 - 1.8.1
   - Added support for rule34.paheal.net post URLs.
 - 1.8.0
